@@ -1,6 +1,7 @@
 package com.example.banking.service.impl;
 
 import com.example.banking.dto.AccountDto;
+import com.example.banking.dto.TransactionDto;
 import com.example.banking.dto.TransferFundDto;
 import com.example.banking.entity.Account;
 import com.example.banking.entity.Transaction;
@@ -133,5 +134,26 @@ public class AccountServiceImpl implements AccountService {
     accountRepository.save(fromAccount);
     accountRepository.save(accountTo);
 }
+
+    @Override
+    public List<TransactionDto> getAccountTransactions(Long accountId) {
+
+        List<Transaction> transactions = transactionRepository
+                .findByAccountIdOrderByTimestampDesc(accountId);
+
+        return transactions.stream()
+                .map((transaction) -> convertEntityToDto(transaction))
+                .collect(Collectors.toList());
+    }
+
+    private TransactionDto convertEntityToDto(Transaction transaction){
+        return new TransactionDto(
+                transaction.getId(),
+                transaction.getAccountId(),
+                transaction.getAmount(),
+                transaction.getTransactionType(),
+                transaction.getTimestamp()
+        );
+    }
 
 }
